@@ -27,4 +27,8 @@ public class Vector2 {
       double pow = Math.pow(10, decimals);
       return "<" + Math.round(x*pow) / pow + ", " + Math.round(y*pow) / pow + ">";
     }
+    public String toStringPolar(int decimals) {
+      double pow = Math.pow(10, decimals);
+      return "<" + Math.round(getMagnitude()*pow) / pow + ", " + Math.round(getAngle() * 180 / Math.PI *pow) / pow + "°>";
+    }
   }

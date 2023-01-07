@@ -67,7 +67,10 @@ public class SwerveDrive extends SubsystemBase {
         pid.enableContinuousInput(0, 2 * Math.PI);
     }
     double StandardizeRAD(double radians) {
-        return (radians + 2 * Math.PI) % (2 * Math.PI);
+        return (radians + 8 * Math.PI) % (2 * Math.PI);
+    }
+    double GetEncoderAngle(CANCoder encoder, int ind) {
+        return StandardizeRAD((encoder.getAbsolutePosition() - Constants.DriveConstants.turnAngleOffsets[ind]) * Math.PI / 180 * (Constants.DriveConstants.turnEncoderInversed[ind] ? 1 : -1));
     }
     public Vector2[] SetWheelSpeeds(double joystickMag, double joystickAngle, double joystickRotation) {    
         double maxMotorUse = maxSwerveMotorUse.getDouble(SwerveDriveMathConstants.maxMotorUse_default);
@@ -93,21 +96,27 @@ public class SwerveDrive extends SubsystemBase {
         frontRightDriveMotor.set(wheelSpeeds[1].getMagnitude());
         backLeftDriveMotor.set(wheelSpeeds[2].getMagnitude());
         backRightDriveMotor.set(wheelSpeeds[3].getMagnitude());
-        frontLeftTurnMotor.set(pid.calculate(StandardizeRAD(frontLeftEncoder.getAbsolutePosition() * Math.PI / 180), wheelSpeeds[0].getAngle()));
-        frontRightTurnMotor.set(pid.calculate(StandardizeRAD(frontRightEncoder.getAbsolutePosition() * Math.PI / 180), wheelSpeeds[1].getAngle()));
-        backLeftTurnMotor.set(pid.calculate(StandardizeRAD(backLeftEncoder.getAbsolutePosition() * Math.PI / 180), wheelSpeeds[2].getAngle()));
-        backRightTurnMotor.set(pid.calculate(StandardizeRAD(backRightEncoder.getAbsolutePosition() * Math.PI / 180), wheelSpeeds[3].getAngle()));
+
+        double frontLeftAngle = GetEncoderAngle(frontLeftEncoder, 0);
+        double frontRightAngle = GetEncoderAngle(frontRightEncoder, 1);
+        double backLeftAngle = GetEncoderAngle(backLeftEncoder, 2);
+        double backRightAngle = GetEncoderAngle(backRightEncoder, 3);
+        
+        frontLeftTurnMotor.set(pid.calculate(frontLeftAngle, wheelSpeeds[0].getAngle()));
+        frontRightTurnMotor.set(pid.calculate(frontRightAngle, wheelSpeeds[1].getAngle()));
+        backLeftTurnMotor.set(pid.calculate(backLeftAngle, wheelSpeeds[2].getAngle()));
+        backRightTurnMotor.set(pid.calculate(backRightAngle, wheelSpeeds[3].getAngle()));
         
         //Shuffle Board//
         for(int i = 0; i < wheelSpeeds.length; i++) {
-            swerveWheels[i].setString(wheelSpeeds[i].toString(3));
+            swerveWheels[i].setString(wheelSpeeds[i].toStringPolar(3));
         }
-        encoders[0].setString(frontLeftEncoder.getAbsolutePosition() + "°");
-        encoders[1].setString(frontRightEncoder.getAbsolutePosition() + "°");
-        encoders[2].setString(backLeftEncoder.getAbsolutePosition() + "°");
-        encoders[3].setString(backRightEncoder.getAbsolutePosition() + "°");
+        encoders[0].setString(frontLeftAngle * 180 / Math.PI + "°");
+        encoders[1].setString(frontRightAngle * 180 / Math.PI + "°");
+        encoders[2].setString(backLeftAngle * 180 / Math.PI + "°");
+        encoders[3].setString(backRightAngle * 180 / Math.PI + "°");
         /////////////////
-        
+
         return wheelSpeeds;
     }
 }
