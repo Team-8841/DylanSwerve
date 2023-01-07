@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.text.DecimalFormat;
 import java.util.Map;
 
 public class SwerveDrive extends SubsystemBase {
@@ -64,13 +66,19 @@ public class SwerveDrive extends SubsystemBase {
 
 
     public SwerveDrive() {
-        pid.enableContinuousInput(0, 2 * Math.PI);
+        pid.enableContinuousInput(-Math.PI, Math.PI);
+        pid.setSetpoint(0);
     }
     double StandardizeRAD(double radians) {
         return (radians + 8 * Math.PI) % (2 * Math.PI);
     }
     double GetEncoderAngle(CANCoder encoder, int ind) {
         return StandardizeRAD((encoder.getAbsolutePosition() - Constants.DriveConstants.turnAngleOffsets[ind]) * Math.PI / 180 * (Constants.DriveConstants.turnEncoderInversed[ind] ? 1 : -1));
+    }
+    double TurnPID(CANSparkMax motor, double currentAngle, double targetAngle) {
+        double angleDif = Math.abs((targetAngle - currentAngle - Math.PI) % (2 * Math.PI)) - Math.PI;
+        motor.set(pid.calculate(angleDif));
+        return angleDif;
     }
     public Vector2[] SetWheelSpeeds(double joystickMag, double joystickAngle, double joystickRotation) {    
         double maxMotorUse = maxSwerveMotorUse.getDouble(SwerveDriveMathConstants.maxMotorUse_default);
@@ -101,26 +109,29 @@ public class SwerveDrive extends SubsystemBase {
         double frontRightAngle = GetEncoderAngle(frontRightEncoder, 1);
         double backLeftAngle = GetEncoderAngle(backLeftEncoder, 2);
         double backRightAngle = GetEncoderAngle(backRightEncoder, 3);
+
+        double[] angleDifs = {0, 0, 0, 0};
         if(joystickMag == 0) {
             frontLeftTurnMotor.set(0);
             frontRightTurnMotor.set(0);
             backLeftTurnMotor.set(0);
             backRightTurnMotor.set(0);
         } else {
-            frontLeftTurnMotor.set(pid.calculate(frontLeftAngle, wheelSpeeds[0].getAngle()));
-            frontRightTurnMotor.set(pid.calculate(frontRightAngle, wheelSpeeds[1].getAngle()));
-            backLeftTurnMotor.set(pid.calculate(backLeftAngle, wheelSpeeds[2].getAngle()));
-            backRightTurnMotor.set(pid.calculate(backRightAngle, wheelSpeeds[3].getAngle()));
+            angleDifs[0] = TurnPID(frontLeftTurnMotor, frontLeftAngle, wheelSpeeds[0].getAngle());
+            angleDifs[1] = TurnPID(frontRightTurnMotor, frontRightAngle, wheelSpeeds[1].getAngle());
+            angleDifs[2] = TurnPID(backLeftTurnMotor, backLeftAngle, wheelSpeeds[2].getAngle());
+            angleDifs[3] = TurnPID(backRightTurnMotor, backRightAngle, wheelSpeeds[3].getAngle());
         }
         
         //Shuffle Board//
         for(int i = 0; i < wheelSpeeds.length; i++) {
             swerveWheels[i].setString(wheelSpeeds[i].toStringPolar(3));
         }
-        encoders[0].setString(frontLeftAngle * 180 / Math.PI + "°");
-        encoders[1].setString(frontRightAngle * 180 / Math.PI + "°");
-        encoders[2].setString(backLeftAngle * 180 / Math.PI + "°");
-        encoders[3].setString(backRightAngle * 180 / Math.PI + "°");
+        DecimalFormat format = new DecimalFormat("#.###");
+        encoders[0].setString(format.format(frontLeftAngle * 180 / Math.PI) + "° | Δ" + format.format(angleDifs[0] * 180 / Math.PI) + "°");
+        encoders[1].setString(format.format(frontRightAngle * 180 / Math.PI) + "° | Δ" + format.format(angleDifs[1] * 180 / Math.PI) + "°");
+        encoders[2].setString(format.format(backLeftAngle * 180 / Math.PI)+ "° | Δ" + format.format(angleDifs[2] * 180 / Math.PI) + "°");
+        encoders[3].setString(format.format(backRightAngle * 180 / Math.PI) + "° | Δ" + format.format(angleDifs[3] * 180 / Math.PI) + "°");
         /////////////////
 
         return wheelSpeeds;
