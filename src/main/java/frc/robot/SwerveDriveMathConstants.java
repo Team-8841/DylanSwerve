@@ -6,7 +6,7 @@ public class SwerveDriveMathConstants {
     ////
     public static final double maxMotorUse_default = 1;//0-1 //maximum usage of all motors
     public static final double maxRotationSlider_default = 0.5;//0-1 //max rotation motor usage
-    public static final double maxMoveSpeed_default = 0.9;//0-1 //max move motor usage
+    public static final double maxMoveSpeed_default = 0.5;//0-1 //max move motor usage
     //
     public static double maxMotorUse = maxMotorUse_default;
     public static double maxRotationSlider = maxRotationSlider_default;
