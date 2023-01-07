@@ -162,4 +162,4 @@ bin/
 *-window.json
 
 # Dylan added this, please don't remove
-!/src/main/java/frc/robot/
+!shuffleboard.json
