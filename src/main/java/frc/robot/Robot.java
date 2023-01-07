@@ -7,14 +7,14 @@ package frc.robot;
 import java.util.Map;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.WidgetType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.TimedRobot;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -27,21 +27,6 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-
-  //Swerve Drive code
-  private NetworkTableEntry maxSwerveShuffle(String name) {
-    return Shuffleboard.getTab("Drive").add(name, SwerveDriveMathConstants.maxMotorUse_default)
-    .withWidget(BuiltInWidgets.kNumberSlider)
-    .withProperties(Map.of("min", 0, "max", 1)).getEntry();
-  }
-  private NetworkTableEntry motorSwerveShuffle(String name) {
-    return Shuffleboard.getTab("Drive").add(name, "<0, 0>")
-    .withWidget(BuiltInWidgets.kTextView).getEntry();
-  }
-  private NetworkTableEntry maxSwerveMotorUse = maxSwerveShuffle("Max Swerve Motor Use");
-  private NetworkTableEntry maxSwerveRotationSpeed = maxSwerveShuffle("Max Swerve Rotation Speed");
-  private NetworkTableEntry maxSwerveSpeed = maxSwerveShuffle("Max Swerve Speed");
-  private NetworkTableEntry[] swerveWheels = {motorSwerveShuffle("Front Left Wheel"), motorSwerveShuffle("Front Right Wheel"), motorSwerveShuffle("Back Left Wheel"), motorSwerveShuffle("Back Right Wheel")};
   
   public SwerveDrive swerveDrive = new SwerveDrive();
   //
@@ -117,20 +102,8 @@ public class Robot extends TimedRobot {
     if(Math.abs(rotationSpeed) < 0.1) {
       rotationSpeed = 0;
     }
-
-    double maxMotorUse = maxSwerveMotorUse.getDouble(SwerveDriveMathConstants.maxMotorUse_default);
-    double maxRotationSpeed = maxSwerveRotationSpeed.getDouble(SwerveDriveMathConstants.maxRotationSlider_default);
-    double maxMoveSpeed = maxSwerveSpeed.getDouble(SwerveDriveMathConstants.maxMoveSpeed_default);
-    if(maxMotorUse != SwerveDriveMathConstants.maxMotorUse || maxRotationSpeed != SwerveDriveMathConstants.maxRotationSlider || maxMoveSpeed != SwerveDriveMathConstants.maxMoveSpeed) {
-      SwerveDriveMathConstants.maxMotorUse = maxMotorUse;
-      SwerveDriveMathConstants.maxRotationSlider = maxRotationSpeed;
-      SwerveDriveMathConstants.maxMoveSpeed = maxMoveSpeed;
-      SwerveDriveMathConstants.updateMax();
-    }
     Vector2[] wheelSpeeds = swerveDrive.SetWheelSpeeds(joystickVector.getMagnitude(), joystickVector.getAngle(), rotationSpeed);
-    for(int i = 0; i < wheelSpeeds.length; i++) {
-      swerveWheels[i].setString(wheelSpeeds[i].toString(3));
-    }
+
   }
 
   /** This function is called once when the robot is disabled. */

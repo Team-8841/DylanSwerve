@@ -8,8 +8,8 @@ public class Constants {
 
         public static float[] turnAngleOffsets = {0, 0, 0, 0};
 
-        public static float turnPID_P;
-        public static float turnPID_I;
-        public static float turnPID_D;
+        public static double turnPID_P = 0.5;
+        public static double turnPID_I = 0;
+        public static double turnPID_D = 0;
     }
 }
