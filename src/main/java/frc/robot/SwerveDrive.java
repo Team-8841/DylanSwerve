@@ -101,11 +101,17 @@ public class SwerveDrive extends SubsystemBase {
         double frontRightAngle = GetEncoderAngle(frontRightEncoder, 1);
         double backLeftAngle = GetEncoderAngle(backLeftEncoder, 2);
         double backRightAngle = GetEncoderAngle(backRightEncoder, 3);
-        
-        frontLeftTurnMotor.set(pid.calculate(frontLeftAngle, wheelSpeeds[0].getAngle()));
-        frontRightTurnMotor.set(pid.calculate(frontRightAngle, wheelSpeeds[1].getAngle()));
-        backLeftTurnMotor.set(pid.calculate(backLeftAngle, wheelSpeeds[2].getAngle()));
-        backRightTurnMotor.set(pid.calculate(backRightAngle, wheelSpeeds[3].getAngle()));
+        if(joystickMag == 0) {
+            frontLeftTurnMotor.set(0);
+            frontRightTurnMotor.set(0);
+            backLeftTurnMotor.set(0);
+            backRightTurnMotor.set(0);
+        } else {
+            frontLeftTurnMotor.set(pid.calculate(frontLeftAngle, wheelSpeeds[0].getAngle()));
+            frontRightTurnMotor.set(pid.calculate(frontRightAngle, wheelSpeeds[1].getAngle()));
+            backLeftTurnMotor.set(pid.calculate(backLeftAngle, wheelSpeeds[2].getAngle()));
+            backRightTurnMotor.set(pid.calculate(backRightAngle, wheelSpeeds[3].getAngle()));
+        }
         
         //Shuffle Board//
         for(int i = 0; i < wheelSpeeds.length; i++) {

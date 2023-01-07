@@ -91,8 +91,8 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
-    Vector2 joystickVector = new Vector2(controller.getRawAxis(4), -controller.getRawAxis(5));
-    double rotationSpeed = controller.getRawAxis(0);
+    Vector2 joystickVector = new Vector2(controller.getRawAxis(0), -controller.getRawAxis(1));
+    double rotationSpeed = controller.getRawAxis(4);
     if(Math.abs(joystickVector.x) < 0.1) {
       joystickVector.x = 0;
     }
