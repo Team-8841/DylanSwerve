@@ -26,6 +26,5 @@
     },
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
-  "git.ignoreLimitWarning": true,
-  "wpilib.selectDefaultSimulateExtension": true
+  "git.ignoreLimitWarning": true
 }
