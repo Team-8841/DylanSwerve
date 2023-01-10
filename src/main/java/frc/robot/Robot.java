@@ -29,6 +29,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+
+    //var a = new SwerveDrivePath(new Vector2(232.8, 37), new Vector2(0.297, -0.36), new Vector2(294.4, 19.5), new Vector2(-0.10938007131100254, -0.994));
+    //System.out.println(a.GetClosestTime(new Vector2(252, 42.7)));
+    
     //m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
     //m_chooser.addOption("My Auto", kCustomAuto);
     //SmartDashboard.putData("Auto choices", m_chooser);
