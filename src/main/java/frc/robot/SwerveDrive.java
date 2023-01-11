@@ -30,7 +30,7 @@ public class SwerveDrive extends SubsystemBase {
     CANCoder frontRightEncoder = new CANCoder(Constants.DriveConstants.swerveEncoderPorts[1]);
     CANCoder backLeftEncoder = new CANCoder(Constants.DriveConstants.swerveEncoderPorts[2]);
     CANCoder backRightEncoder = new CANCoder(Constants.DriveConstants.swerveEncoderPorts[3]);
-    
+
     public boolean fieldOriented = true;
 
     private final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);//TODO: Uncomment and reimplement when AHRS is updated for WPI 2023
@@ -64,7 +64,27 @@ public class SwerveDrive extends SubsystemBase {
     public void Start() {
         pid.enableContinuousInput(-Math.PI, Math.PI);
         pid.setSetpoint(0);
+        configureSparkBrake(frontLeftDriveMotor);
+        configureSparkBrake(frontRightDriveMotor);
+        configureSparkBrake(backLeftDriveMotor);
+        configureSparkBrake(backRightDriveMotor);
     }
+    
+
+  private void configureSparkCoast(CANSparkMax sparkMax) {
+    sparkMax.restoreFactoryDefaults();
+    sparkMax.setOpenLoopRampRate(Constants.DriveConstants.kDTRampRate);
+    sparkMax.setSmartCurrentLimit(Constants.DriveConstants.kCurrentLimit);
+    sparkMax.setIdleMode(CANSparkMax.IdleMode.kCoast);
+  }
+
+  private void configureSparkBrake(CANSparkMax sparkMax) {
+    sparkMax.restoreFactoryDefaults();
+    sparkMax.setOpenLoopRampRate(Constants.DriveConstants.kDTRampRate);
+    sparkMax.setSmartCurrentLimit(Constants.DriveConstants.kCurrentLimit);
+    sparkMax.setIdleMode(CANSparkMax.IdleMode.kBrake);
+  }
+
     double StandardizeRAD(double radians) {
         return (radians + 8 * Math.PI) % (2 * Math.PI);
     }

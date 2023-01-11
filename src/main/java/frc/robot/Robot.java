@@ -94,16 +94,15 @@ public class Robot extends TimedRobot {
       swerveDrive.ResetRotation();
       System.out.println("Reseted Swerve rotation, instructed by controller");
     }
-    if(Math.abs(joystickVector.x) < 0.1) {
-      joystickVector.x = 0;
-    }
-    if(Math.abs(joystickVector.y) < 0.1) {
-      joystickVector.y = 0;
-    }
     if(Math.abs(rotationSpeed) < 0.1) {
       rotationSpeed = 0;
     }
-    Vector2[] wheelSpeeds = swerveDrive.SetWheelSpeeds(joystickVector.getMagnitude(), joystickVector.getAngle(), rotationSpeed);
+    double joyMag = joystickVector.getMagnitude();
+    double curvedMag = (3*joyMag*joyMag*joyMag+1)/4*Math.sqrt(joyMag);
+    curvedMag = Math.max((curvedMag-0.05)/(1-0.05), 0);
+    double absRotation = Math.abs(rotationSpeed);
+    double newRotationSpeed = ((3*absRotation*absRotation*absRotation+1)/4*Math.sqrt(absRotation)) * Math.signum(rotationSpeed); 
+    Vector2[] wheelSpeeds = swerveDrive.SetWheelSpeeds(curvedMag, joystickVector.getAngle(), newRotationSpeed);
 
   }
 
