@@ -103,7 +103,7 @@ public class Robot extends TimedRobot {
     double absRotation = Math.abs(rotationSpeed);
     double newRotationSpeed = ((3*absRotation*absRotation*absRotation+1)/4*Math.sqrt(absRotation)) * Math.signum(rotationSpeed); 
     Vector2[] wheelSpeeds = swerveDrive.SetWheelSpeeds(curvedMag, joystickVector.getAngle(), newRotationSpeed);
-
+    //System.out.println(swerveDrive.m_navx.getDisplacementX() + " " + swerveDrive.m_navx.getDisplacementY() + " " + swerveDrive.m_navx.getDisplacementZ());
   }
 
   /** This function is called once when the robot is disabled. */

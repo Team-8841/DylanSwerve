@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.SPI;
 
 import java.text.DecimalFormat;
 import java.util.Map;
+import java.util.Vector;
 
 public class SwerveDrive extends SubsystemBase {
     double robotRotationOffset;
@@ -33,7 +34,7 @@ public class SwerveDrive extends SubsystemBase {
 
     public boolean fieldOriented = true;
 
-    private final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);//TODO: Uncomment and reimplement when AHRS is updated for WPI 2023
+    public final AHRS m_navx = new AHRS(SPI.Port.kMXP, (byte) 200);//TODO: Uncomment and reimplement when AHRS is updated for WPI 2023
     PIDController pid = new PIDController(Constants.DriveConstants.turnPID_P, Constants.DriveConstants.turnPID_I, Constants.DriveConstants.turnPID_D);
     
     
@@ -56,6 +57,8 @@ public class SwerveDrive extends SubsystemBase {
     private GenericEntry maxSwerveSpeed = maxSwerveShuffle("Max Swerve Speed");
     private GenericEntry[] swerveWheels = {motorSwerveShuffle("Front Left Wheel"), motorSwerveShuffle("Front Right Wheel"), motorSwerveShuffle("Back Left Wheel"), motorSwerveShuffle("Back Right Wheel")};
     private GenericEntry[] encoders = {encoderSwerveShuffle("Front Left Encoder"), encoderSwerveShuffle("Front Right Encoder"), encoderSwerveShuffle("Back Left Encoder"), encoderSwerveShuffle("Back Right Encoder")};
+    private GenericEntry NAVXDisplacement = Shuffleboard.getTab("Drive").add("NAVX Displacement", "<0, 0, 0>")
+    .withWidget(BuiltInWidgets.kTextView).getEntry();
     /////////////////
 
 
@@ -64,10 +67,19 @@ public class SwerveDrive extends SubsystemBase {
     public void Start() {
         pid.enableContinuousInput(-Math.PI, Math.PI);
         pid.setSetpoint(0);
+
         configureSparkBrake(frontLeftDriveMotor);
         configureSparkBrake(frontRightDriveMotor);
         configureSparkBrake(backLeftDriveMotor);
         configureSparkBrake(backRightDriveMotor);
+
+        //
+        configureSparkCoast(frontLeftTurnMotor);
+        configureSparkCoast(frontRightTurnMotor);
+        configureSparkCoast(backLeftTurnMotor);
+        configureSparkCoast(backRightTurnMotor);
+
+        m_navx.resetDisplacement();
     }
     
 
@@ -149,7 +161,7 @@ public class SwerveDrive extends SubsystemBase {
         encoders[2].setString(format.format(backLeftAngle * 180 / Math.PI)+ "° | Δ" + format.format(angleDifs[2].x * 180 / Math.PI) + "°");
         encoders[3].setString(format.format(backRightAngle * 180 / Math.PI) + "° | Δ" + format.format(angleDifs[3].x * 180 / Math.PI) + "°");
         /////////////////
-
+        NAVXDisplacement.setString("<" + m_navx.getDisplacementX() + ", " + m_navx.getDisplacementY() + ", " + m_navx.getDisplacementZ() + ">");
         return wheelSpeeds;
     }
     public void ResetRotation() {

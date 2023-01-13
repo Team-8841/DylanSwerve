@@ -2,6 +2,8 @@ package frc.robot;
 import org.apache.commons.math3.analysis.solvers.LaguerreSolver;
 import org.apache.commons.math3.complex.Complex;
 
+import edu.wpi.first.math.controller.PIDController;
+
 public class SwerveDrivePath {
     Vector2 startPos;
     Vector2 startVelocity;
@@ -14,6 +16,7 @@ public class SwerveDrivePath {
     double my1;
     double my2;
     double my3;
+    double mult;
     public SwerveDrivePath(Vector2 startPos, Vector2 startVelocity, Vector2 endPos, Vector2 endVelocity) {
         this.startPos = startPos;
         this.startVelocity = startVelocity;
@@ -23,7 +26,7 @@ public class SwerveDrivePath {
         //Math stuff//
         //https://www.desmos.com/calculator/jpy4q7hgfy
         Vector2 posDif = new Vector2(endPos.x - startPos.x, endPos.y - startPos.y);
-        double mult = Math.sqrt(posDif.x*posDif.x + posDif.y*posDif.y);
+        mult = Math.sqrt(posDif.x*posDif.x + posDif.y*posDif.y);
         mx1 = mult * startVelocity.x;
         my1 = mult * startVelocity.y;
 
@@ -33,6 +36,9 @@ public class SwerveDrivePath {
         mx3 = posDif.x - mx2 - mx1;
         my3 = posDif.y - my2 - my1;
         //////////////
+    }
+    public Vector2 GetRobotSpeed(Vector2 position, PIDController pid) {
+        return new Vector2();
     }
     public Vector2 GetClosestTime(Vector2 position)// returns (time, distance)
      {
@@ -82,5 +88,33 @@ public class SwerveDrivePath {
         }
         return new Vector2(closestTime, Math.sqrt(closestDistSquared));
       ///////////////////
+    }
+
+    public Vector2 Velocity(double time) // magnitude can go over 1. Cap magnitude of resulting vector if you plan to use this to set motor speeds directly
+    {
+      double x = mx1; 
+      double y = my1;
+      x += 2 * mx2 * time;
+      y += 2 * my2 * time;
+      time *= time;
+      x += 3 * mx3 * time;
+      y += 3 * my3 * time;
+      return new Vector2(x/mult, y/mult);
+    }
+  
+    public Vector2 Position(double time) {
+      double x = startPos.x; 
+      double y = startPos.y;
+      double temp = time;
+      
+      x += mx1 * temp;
+      y += my1 * temp;
+      temp *= time;
+      x += mx2 * temp;
+      y += my2 * temp;
+      temp *= time;
+      x += mx3 * temp;
+      y += my3 * temp;
+      return new Vector2(x, y);
     }
 }
