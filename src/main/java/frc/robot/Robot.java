@@ -99,7 +99,7 @@ public class Robot extends TimedRobot {
     }
     double joyMag = joystickVector.getMagnitude();
     double curvedMag = (3*joyMag*joyMag*joyMag+1)/4*Math.sqrt(joyMag);
-    curvedMag = Math.max((curvedMag-0.05)/(1-0.05), 0);
+    curvedMag = Math.max((curvedMag-Constants.DriveConstants.driveDeadband)/(1-Constants.DriveConstants.driveDeadband), 0);
     double absRotation = Math.abs(rotationSpeed);
     double newRotationSpeed = ((3*absRotation*absRotation*absRotation+1)/4*Math.sqrt(absRotation)) * Math.signum(rotationSpeed); 
     Vector2[] wheelSpeeds = swerveDrive.SetWheelSpeeds(curvedMag, joystickVector.getAngle(), newRotationSpeed);

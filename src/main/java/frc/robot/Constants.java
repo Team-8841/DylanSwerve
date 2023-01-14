@@ -20,6 +20,7 @@ public class Constants {
         public static double turnPID_I = 0;
         public static double turnPID_D = 0;
 
+        public static double driveDeadband = 0.05;
     }
 
 }
